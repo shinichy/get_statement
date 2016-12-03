@@ -16,7 +16,7 @@ pip install -r requirements.txt
 # get_statement.pyのchromedriver_pathを書き換える
 vi get_statement.py
 
-# モバイルSuica
+# モバイルSuica (画像認証を入力する必要あり)
 python get_statement.py suica <JR EAST ID> <パスワード>
 
 # 住信SBIネット銀行

@@ -117,6 +117,7 @@ def get_suica_history(driver, jreast_id, password):
     driver.find_element_by_xpath('//input[@src="/img/btn_login_myjr.gif" and @name="MYLOGIN"]').click()
 
     # 画像認証
+    print('画像に表示されている文字を入力して下さい')
     string = input()
     driver.find_element_by_id('MainContent_upImageStringsTextBox').send_keys(string)
     driver.find_element_by_id('MainContent_passwordTextBox').send_keys(password)
