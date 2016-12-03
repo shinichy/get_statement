@@ -22,9 +22,17 @@ class Sites:
 
 
 def get_sbi_history(driver, username, password):
+    # ログイン
     driver.get('https://www.netbk.co.jp/wpl/NBGate')
     driver.find_element_by_name('userName').send_keys(username)
     driver.find_element_by_name('loginPwdSet').send_keys(password)
+    driver.find_element_by_xpath('//input[@src="https://contents-cache.netbk.co.jp/pc/img_cmn/b_login_01.gif"]').click()
+
+    # 入出金明細
+    driver.get('https://www.netbk.co.jp/wpl/NBGate/i020201CT')
+    driver.find_element_by_id('CD020202VALUE03').click()
+    driver.find_element_by_name('ACT_doShow').click()
+    driver.find_element_by_xpath('//a[@href="javascript:submitForm(\'form0202_01_100\')"]').click()
 
 
 def get_suica_history(driver, jreast_id, password):
@@ -62,10 +70,12 @@ parser.add_argument('site', choices=Sites.list())
 parser.add_argument('id')
 parser.add_argument('password')
 args = parser.parse_args()
-driver = None
-try:
-    driver = webdriver.Chrome(chromedriver_path)
-    if args.site == Sites.suica:
-        get_suica_history(driver, args.id, args.password)
-finally:
-    driver.close()
+driver = webdriver.Chrome(chromedriver_path)
+if args.site == Sites.suica:
+    get_suica_history(driver, args.id, args.password)
+elif args.site == Sites.sbi:
+    get_sbi_history(driver, args.id, args.password)
+else:
+    print('%s is not supported' % args.site)
+driver.close()
+
