@@ -7,18 +7,55 @@ import argparse
 from datetime import datetime, date, timedelta
 
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 chromedriver_path = '/usr/local/bin/chromedriver'
+
+today = date.today()
+last_day = datetime(today.year, today.month, 1) - timedelta(days=1)
 
 
 class Sites:
     suica = 'suica'
     sbi = 'sbi'
+    jpnetbk = 'jpnetbk'
 
     @staticmethod
     def list():
-        return [Sites.suica, Sites.sbi]
+        return [Sites.suica, Sites.sbi, Sites.jpnetbk]
+
+
+def get_jpnetbk_history(driver, username, password, branch_no, account_no):
+    # ログイン
+    driver.get('https://login.japannetbank.co.jp/wctx/LoginAction.do?loginIdFlg=1')
+    driver.find_element_by_id('idTenNo').send_keys(branch_no)
+    driver.find_element_by_id('idKozaNo').send_keys(account_no)
+    driver.find_element_by_id('idLoginId').send_keys(username)
+    driver.find_element_by_id('idPw').send_keys(password)
+    driver.find_element_by_name('login').click()
+
+    # ポップアップチェック
+    popup = driver.find_element_by_xpath('//a[@href="javascript:infoFadeOut()"]')
+    if popup:
+        popup.click()
+
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.invisibility_of_element_located((By.ID,'seqInfo')))
+
+    driver.find_element_by_xpath("//a[@href=\"javascript:commonSubmit('a0001')\"]").click()
+
+    # 入出金明細
+    Select(driver.find_element_by_name('ShokaiStartDateNenIn')).select_by_value(str(last_day.year))
+    Select(driver.find_element_by_name('ShokaiStartDateTsukiIn')).select_by_value(str(last_day.month))
+    Select(driver.find_element_by_name('ShokaiStartDateHiIn')).select_by_value('1')
+    Select(driver.find_element_by_name('ShokaiEndDateNenIn')).select_by_value(str(last_day.year))
+    Select(driver.find_element_by_name('ShokaiEndDateTsukiIn')).select_by_value(str(last_day.month))
+    Select(driver.find_element_by_name('ShokaiEndDateHiIn')).select_by_value(str(last_day.day))
+    driver.find_element_by_xpath('//input[@onclick="searchPeriod(this.form)"]').click()
+    driver.find_element_by_xpath('//input[@type="button" and @value="PDF"]').click()
 
 
 def get_sbi_history(driver, username, password):
@@ -54,8 +91,6 @@ def get_suica_history(driver, jreast_id, password):
     driver.find_element_by_xpath('//img[@src="/img/btn_riyourireki_off.gif"]').click()
 
     # 履歴ページ
-    today = date.today()
-    last_day = datetime(today.year, today.month, 1) - timedelta(days=1)
     Select(driver.find_element_by_name('specifyYearMonth')).select_by_value(
         '%s/%s' % (last_day.year, last_day.month))
     Select(driver.find_element_by_name('specifyDay')).select_by_value(str(last_day.day))
@@ -69,13 +104,19 @@ parser = argparse.ArgumentParser(description='Get bank histories')
 parser.add_argument('site', choices=Sites.list())
 parser.add_argument('id')
 parser.add_argument('password')
+parser.add_argument('--branch')
+parser.add_argument('--account')
 args = parser.parse_args()
 driver = webdriver.Chrome(chromedriver_path)
 if args.site == Sites.suica:
     get_suica_history(driver, args.id, args.password)
 elif args.site == Sites.sbi:
     get_sbi_history(driver, args.id, args.password)
+elif args.site == Sites.jpnetbk:
+    if args.branch and args.account:
+        get_jpnetbk_history(driver, args.id, args.password, args.branch, args.account)
+    else:
+        print('Enter your branch and account numbers')
 else:
     print('%s is not supported' % args.site)
-driver.close()
-
+# driver.close()
