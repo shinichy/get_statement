@@ -8,9 +8,9 @@ from datetime import datetime, date, timedelta
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 chromedriver_path = '/usr/local/bin/chromedriver'
 
@@ -22,10 +22,32 @@ class Sites:
     suica = 'suica'
     sbi = 'sbi'
     jpnetbk = 'jpnetbk'
+    ufj = 'ufj'
 
     @staticmethod
     def list():
-        return [Sites.suica, Sites.sbi, Sites.jpnetbk]
+        return [Sites.suica, Sites.sbi, Sites.jpnetbk, Sites.ufj]
+
+
+def get_ufj_history(driver, username, password):
+    # ログイン
+    driver.get('https://entry11.bk.mufg.jp/ibg/dfw/APLIN/loginib/login?_TRANID=AA000_001')
+    driver.find_element_by_id('account_id').send_keys(username)
+    driver.find_element_by_id('ib_password').send_keys(password)
+    driver.find_element_by_xpath(
+        '//img[@src="https://directg.s.bk.mufg.jp/refresh/imgs/_DIRECT_IMAGE/LOGINOUT/btn_login_off.gif"]').click()
+
+    # トップ
+    driver.find_element_by_xpath(
+        '//img[@src="https://directg.s.bk.mufg.jp/refresh/imgs/_DIRECT_IMAGE/LOGINOUT/btn_account_01_off.gif"]').click()
+
+    # 入出金明細
+    driver.find_element_by_xpath(
+        '//img[@src="https://directg.s.bk.mufg.jp/refresh/imgs/_DIRECT_IMAGE/YEN/btn_meisai_download_off.gif"]').click()
+    driver.find_element_by_id('last_month').click()
+    driver.find_element_by_xpath(
+        '//img[@src="https://directg.s.bk.mufg.jp/refresh/imgs/_DIRECT_IMAGE/COMMON/btn_download_off.jpg"]').click()
+    driver.find_element_by_xpath('//li[@class="logout"]/a').click()
 
 
 def get_jpnetbk_history(driver, username, password, branch_no, account_no):
@@ -43,7 +65,7 @@ def get_jpnetbk_history(driver, username, password, branch_no, account_no):
         popup.click()
 
     wait = WebDriverWait(driver, 10)
-    wait.until(EC.invisibility_of_element_located((By.ID,'seqInfo')))
+    wait.until(EC.invisibility_of_element_located((By.ID, 'seqInfo')))
 
     driver.find_element_by_xpath("//a[@href=\"javascript:commonSubmit('a0001')\"]").click()
 
@@ -117,6 +139,8 @@ elif args.site == Sites.jpnetbk:
         get_jpnetbk_history(driver, args.id, args.password, args.branch, args.account)
     else:
         print('Enter your branch and account numbers')
+elif args.site == Sites.ufj:
+    get_ufj_history(driver, args.id, args.password)
 else:
     print('%s is not supported' % args.site)
 # driver.close()
