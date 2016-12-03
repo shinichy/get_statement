@@ -23,10 +23,24 @@ class Sites:
     sbi = 'sbi'
     jpnetbk = 'jpnetbk'
     ufj = 'ufj'
+    enavi = 'enavi'
 
     @staticmethod
     def list():
-        return [Sites.suica, Sites.sbi, Sites.jpnetbk, Sites.ufj]
+        return [Sites.suica, Sites.sbi, Sites.jpnetbk, Sites.ufj, Sites.enavi]
+
+
+def get_enavi_history(driver, username, password):
+    # ログイン
+    driver.get('https://www.rakuten-card.co.jp/e-navi/')
+    driver.find_element_by_id('u').send_keys(username)
+    driver.find_element_by_id('p').send_keys(password)
+    driver.find_element_by_id('loginButton').click()
+
+    # ご利用明細
+    driver.get('https://www.rakuten-card.co.jp/e-navi/members/statement/index.xhtml?tabNo=1')
+    driver.get('https://www.rakuten-card.co.jp/e-navi/members/statement/index.xhtml?downloadAsCsv=1')
+    driver.get('https://www.rakuten-card.co.jp/e-navi/logout.xhtml?l-id=enavi_prelogout_cwd_logout')
 
 
 def get_ufj_history(driver, username, password):
@@ -141,6 +155,8 @@ elif args.site == Sites.jpnetbk:
         print('Enter your branch and account numbers')
 elif args.site == Sites.ufj:
     get_ufj_history(driver, args.id, args.password)
+elif args.site == Sites.enavi:
+    get_enavi_history(driver, args.id, args.password)
 else:
     print('%s is not supported' % args.site)
 # driver.close()
