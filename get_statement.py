@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding=utf-8
 
-# Get receipts last month
+# Get the statement of last month
 
 import argparse
 from datetime import datetime, date, timedelta
@@ -159,4 +159,4 @@ elif args.site == Sites.enavi:
     get_enavi_history(driver, args.id, args.password)
 else:
     print('%s is not supported' % args.site)
-# driver.close()
+driver.close()
