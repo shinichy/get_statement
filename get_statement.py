@@ -129,7 +129,7 @@ def get_suica_history(driver, jreast_id, password):
 
     # 履歴ページ
     Select(driver.find_element_by_name('specifyYearMonth')).select_by_value(
-        '%s/%s' % (last_day.year, last_day.month))
+        '%s/%02d' % (last_day.year, last_day.month))
     Select(driver.find_element_by_name('specifyDay')).select_by_value(str(last_day.day))
     driver.find_element_by_id('Submit1').click()
     driver.find_element_by_name('PRINT').click()
