@@ -4,6 +4,7 @@
 # Get the statement of last month
 
 import argparse
+import time
 from datetime import datetime, date, timedelta
 
 from selenium import webdriver
@@ -98,6 +99,22 @@ def get_jpnetbk_history(driver, username, password, branch_no, account_no):
     driver.find_element_by_xpath('//input[@onclick="searchPeriod(this.form)"]').click()
     driver.find_element_by_xpath('//input[@type="button" and @value="PDF"]').click()
 
+    # PDFダウンロードが別タブで開始されるので、終わるまで待つ
+    time.sleep(10)
+
+    driver.find_element_by_xpath('//a[@class="logout"]').click()
+
+    # ポップアップが出現するまで待機
+    wait.until(EC.alert_is_present())
+
+    alert = driver.switch_to_alert()
+    alert.accept()
+
+    wait.until(EC.visibility_of_element_located((By.ID, 'title')))
+
+    driver.close()
+    driver.switch_to.window(driver.window_handles[-1])
+
 
 def get_sbi_history(driver, username, password):
     # ログイン
@@ -122,9 +139,8 @@ def get_suica_history(driver, jreast_id, password):
     driver.find_element_by_xpath('//input[@src="/img/btn_login_myjr.gif" and @name="MYLOGIN"]').click()
 
     # 画像認証
-    print('画像に表示されている文字を入力して下さい')
-    string = input()
-    driver.find_element_by_id('MainContent_upImageStringsTextBox').send_keys(string)
+    captcha = input('画像に表示されている文字を入力して下さい> ')
+    driver.find_element_by_id('MainContent_upImageStringsTextBox').send_keys(captcha)
     driver.find_element_by_id('MainContent_passwordTextBox').send_keys(password)
     driver.find_element_by_id('MainContent_okRadioButton').click()
     driver.find_element_by_id('MainContent_nextButton').click()
@@ -165,4 +181,5 @@ elif args.site == Sites.enavi:
     get_enavi_history(driver, args.id, args.password)
 else:
     print('%s is not supported' % args.site)
+
 driver.close()
