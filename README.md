@@ -3,15 +3,11 @@
 各サービスから先月の利用明細を自動ダウンロードします。
 自己責任でご利用下さい。
 
-# セットアップ
-
-ここからChromeDriverをインストール
-https://sites.google.com/a/chromium.org/chromedriver/downloads
-
 ```
 git clone https://github.com/shinichy/get_statement.git
 cd get_statement
 pip install -r requirements.txt
+brew install chromedriver
 
 # get_statement.pyのchromedriver_pathを書き換える
 vi get_statement.py
