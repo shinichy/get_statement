@@ -21,6 +21,9 @@ python get_statement.py sbi <id> <パスワード>
 # ジャパンネット銀行
 python get_statement.py jpnetbk <ログインID> <パスワード> --branch <店番号> --account <口座番号>
 
+# 三井住友銀行
+python get_statement.py smbc dummy <パスワード> --branch <店番号> --account <口座番号>
+
 # 三菱東京UFJ銀行
 python get_statement.py ufj <契約番号> <パスワード>
 

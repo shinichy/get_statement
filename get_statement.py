@@ -25,10 +25,11 @@ class Sites:
     jpnetbk = 'jpnetbk'
     ufj = 'ufj'
     enavi = 'enavi'
+    smbc = 'smbc'
 
     @staticmethod
     def list():
-        return [Sites.suica, Sites.sbi, Sites.jpnetbk, Sites.ufj, Sites.enavi]
+        return [Sites.suica, Sites.sbi, Sites.jpnetbk, Sites.ufj, Sites.enavi, Sites.smbc]
 
 
 def get_enavi_history(driver, username, password):
@@ -63,6 +64,23 @@ def get_ufj_history(driver, username, password):
     driver.find_element_by_xpath(
         '//img[@src="https://directg.s.bk.mufg.jp/refresh/imgs/_DIRECT_IMAGE/COMMON/btn_download_off.jpg"]').click()
     driver.find_element_by_xpath('//li[@class="logout"]/a').click()
+
+
+def get_smbc_history(driver, password, branch_no, account_no):
+    # ログイン
+    driver.get('https://direct.smbc.co.jp/aib/aibgsjsw5001.jsp')
+    driver.find_element_by_id('S_BRANCH_CD').send_keys(branch_no)
+    driver.find_element_by_id('S_ACCNT_NO').send_keys(account_no)
+    driver.find_element_by_id('PASSWORD').send_keys(password)
+    driver.find_element_by_name('bLogon.y').click()
+
+    # トップ
+    driver.find_element_by_xpath('//a[@title="明細照会"]').click()
+
+    # 入出金明細
+    driver.find_element_by_name('web_zengetu').click()
+    driver.find_element_by_id('DownloadCSV').click()
+    driver.find_element_by_xpath('//a[text()="ログアウト"]').click()
 
 
 def get_jpnetbk_history(driver, username, password, branch_no, account_no):
@@ -173,6 +191,11 @@ elif args.site == Sites.sbi:
 elif args.site == Sites.jpnetbk:
     if args.branch and args.account:
         get_jpnetbk_history(driver, args.id, args.password, args.branch, args.account)
+    else:
+        print('Enter your branch and account numbers')
+elif args.site == Sites.smbc:
+    if args.branch and args.account:
+        get_smbc_history(driver, args.password, args.branch, args.account)
     else:
         print('Enter your branch and account numbers')
 elif args.site == Sites.ufj:
