@@ -207,3 +207,4 @@ else:
     print('%s is not supported' % args.site)
 
 driver.close()
+driver.quit()
