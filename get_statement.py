@@ -69,6 +69,7 @@ def get_ufj_history(driver, username, password):
 def get_smbc_history(driver, password, branch_no, account_no):
     # ログイン
     driver.get('https://direct.smbc.co.jp/aib/aibgsjsw5001.jsp')
+    time.sleep(3)
     driver.find_element_by_id('S_BRANCH_CD').send_keys(branch_no)
     driver.find_element_by_id('S_ACCNT_NO').send_keys(account_no)
     driver.find_element_by_id('PASSWORD').send_keys(password)
