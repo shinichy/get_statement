@@ -139,7 +139,7 @@ def get_sbi_history(driver, username, password):
     driver.get('https://www.netbk.co.jp/wpl/NBGate')
     driver.find_element_by_name('userName').send_keys(username)
     driver.find_element_by_name('loginPwdSet').send_keys(password)
-    driver.find_element_by_xpath('//input[@src="https://contents-cache.netbk.co.jp/pc/img_cmn/b_login_01.gif"]').click()
+    driver.find_element_by_xpath('//input[@alt="ログイン"]').click()
 
     # 入出金明細
     driver.get('https://www.netbk.co.jp/wpl/NBGate/i020201CT')
