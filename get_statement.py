@@ -94,10 +94,8 @@ def get_jpnetbk_history(driver, username, password, branch_no, account_no):
     driver.find_element_by_name('login').click()
 
     wait = WebDriverWait(driver, 10)
-    wait.until(EC.visibility_of_element_located((By.ID, 'modalBox')))
+    wait.until(EC.visibility_of_element_located((By.ID, 'centerContents')))
     driver.find_element_by_id('chk01').click()
-    driver.find_element_by_id('modalClose02').click()
-    driver.find_element_by_name('login').click()
 
     # ポップアップチェック
     popup = driver.find_element_by_xpath('//a[@href="javascript:infoFadeOut()"]')
