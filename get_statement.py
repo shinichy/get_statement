@@ -162,6 +162,9 @@ def get_suica_history(driver, jreast_id, password):
     driver.find_element_by_id('MainContent_okRadioButton').click()
     driver.find_element_by_id('MainContent_nextButton').click()
 
+    # Suica一覧
+    driver.find_element_by_xpath('//input[@alt="次へ"]').click()
+
     # 会員メニュー
     driver.find_element_by_xpath('//img[@src="/img/btn_riyourireki_off.gif"]').click()
 
