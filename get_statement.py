@@ -19,6 +19,15 @@ today = date.today()
 last_day = datetime(today.year, today.month, 1) - timedelta(days=1)
 
 
+def every_downloads_chrome(driver):
+    if not driver.current_url.startswith("chrome://downloads"):
+        driver.get("chrome://downloads/")
+    return driver.execute_script("""
+        var items = downloads.Manager.get().items_;
+        if (items.every(e => e.state === "COMPLETE"))
+            return items.map(e => e.file_url);
+        """)
+
 class Sites:
     suica = 'suica'
     sbi = 'sbi'
@@ -75,6 +84,12 @@ def get_smbc_history(driver, password, branch_no, account_no):
     driver.find_element_by_id('PASSWORD').send_keys(password)
     driver.find_element_by_name('bLogon.y').click()
 
+    # 暗証番号の警告が出たら120日無視
+    checkbox = driver.find_element_by_id('agree')
+    if checkbox:
+        checkbox.click()
+        driver.find_element_by_name('imgNext.y').click()
+
     # トップ
     driver.find_element_by_xpath('//a[@title="明細照会"]').click()
 
@@ -94,15 +109,15 @@ def get_jpnetbk_history(driver, username, password, branch_no, account_no):
     driver.find_element_by_name('login').click()
 
     wait = WebDriverWait(driver, 10)
-    wait.until(EC.visibility_of_element_located((By.ID, 'centerContents')))
-    driver.find_element_by_id('chk01').click()
+    wait.until(EC.visibility_of_element_located((By.ID, 'centerContentsincreaseloan180905')))
+    driver.find_element_by_id('chkincreaseloan180905').click()
 
     # ポップアップチェック
-    popup = driver.find_element_by_xpath('//a[@href="javascript:infoFadeOut()"]')
+    popup = driver.find_element_by_xpath('//a[@href="javascript:pop.close()"]')
     if popup:
         popup.click()
 
-    wait.until(EC.invisibility_of_element_located((By.ID, 'seqInfo')))
+    wait.until(EC.invisibility_of_element_located((By.ID, 'centerContentsincreaseloan180905')))
 
     driver.find_element_by_xpath("//a[@href=\"javascript:commonSubmit('a0001')\"]").click()
 
@@ -146,6 +161,9 @@ def get_sbi_history(driver, username, password):
     driver.find_element_by_name('ACT_doShow').click()
     driver.find_element_by_xpath('//a[@href="javascript:submitForm(\'form0202_01_100\')"]').click()
 
+    # ダウンロード完了まで待つ
+    WebDriverWait(driver, 120, 1).until(every_downloads_chrome)
+
 
 def get_suica_history(driver, jreast_id, password):
     driver.get('https://www.mobilesuica.com/')
@@ -174,8 +192,7 @@ def get_suica_history(driver, jreast_id, password):
     Select(driver.find_element_by_name('specifyDay')).select_by_value(str(last_day.day))
     driver.find_element_by_id('Submit1').click()
     driver.find_element_by_name('PRINT').click()
-    # html = driver.page_source.encode('shift_jis', 'ignore')
-    # print(html.decode('shift-jis'))
+    WebDriverWait(driver, 120, 1).until(every_downloads_chrome)
 
 
 parser = argparse.ArgumentParser(description='Get bank histories')
