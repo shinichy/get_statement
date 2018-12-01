@@ -85,8 +85,8 @@ def get_smbc_history(driver, password, branch_no, account_no):
     driver.find_element_by_name('bLogon.y').click()
 
     # 暗証番号の警告が出たら120日無視
-    checkbox = driver.find_element_by_id('agree')
-    if checkbox:
+    if len(driver.find_elements_by_id('agree')) > 0:
+        checkbox = driver.find_element_by_id('agree')
         checkbox.click()
         driver.find_element_by_name('imgNext.y').click()
 
@@ -109,15 +109,15 @@ def get_jpnetbk_history(driver, username, password, branch_no, account_no):
     driver.find_element_by_name('login').click()
 
     wait = WebDriverWait(driver, 10)
-    wait.until(EC.visibility_of_element_located((By.ID, 'centerContentsincreaseloan180905')))
-    driver.find_element_by_id('chkincreaseloan180905').click()
+    wait.until(EC.visibility_of_element_located((By.ID, 'centerContents')))
+    driver.find_element_by_id('chk01').click()
 
     # ポップアップチェック
-    popup = driver.find_element_by_xpath('//a[@href="javascript:pop.close()"]')
+    popup = driver.find_element_by_xpath('//a[@href="javascript:infoFadeOut()"]')
     if popup:
         popup.click()
 
-    wait.until(EC.invisibility_of_element_located((By.ID, 'centerContentsincreaseloan180905')))
+    wait.until(EC.invisibility_of_element_located((By.ID, 'seqInfo')))
 
     driver.find_element_by_xpath("//a[@href=\"javascript:commonSubmit('a0001')\"]").click()
 
